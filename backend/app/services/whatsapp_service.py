@@ -17,7 +17,9 @@ def _send(phone_number_id: str, payload: Dict[str, Any]) -> bool:
     }
     try:
         r = httpx.post(url, json=payload, headers=headers, timeout=10)
-        r.raise_for_status()
+        if not r.is_success:
+            print(f"[WA] Send error {r.status_code}: {r.text}")
+            return False
         return True
     except Exception as e:
         print(f"[WA] Send error: {e}")
