@@ -156,6 +156,10 @@ def delete_doctor(
     if not doctor:
         raise HTTPException(status_code=404, detail="Doctor not found")
 
+    from app.models.queue import QueueState
+    from app.models.token import Token
+    db.query(QueueState).filter(QueueState.doctor_id == doctor_id).delete()
+    db.query(Token).filter(Token.doctor_id == doctor_id).delete()
     db.delete(doctor)
     db.commit()
     return {"message": "Doctor deleted"}
