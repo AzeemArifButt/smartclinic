@@ -62,6 +62,7 @@ async def receive_webhook(request: Request, db: Session = Depends(get_db)):
             metadata = value.get("metadata", {})
             phone_number_id = metadata.get("phone_number_id", "")
             display_phone = metadata.get("display_phone_number", "")
+            print(f"[Webhook] phone_number_id={phone_number_id} display_phone={display_phone}")
 
             # Identify clinic by phone_number_id or display number
             clinic = (
@@ -77,7 +78,9 @@ async def receive_webhook(request: Request, db: Session = Depends(get_db)):
                     .first()
                 )
             if not clinic:
+                print(f"[Webhook] No clinic found for phone_number_id={phone_number_id}")
                 continue  # Unknown number — skip
+            print(f"[Webhook] Matched clinic: {clinic.name} (id={clinic.id})")
 
             for msg in value.get("messages", []):
                 from_phone = msg.get("from", "")
