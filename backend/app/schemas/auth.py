@@ -33,6 +33,7 @@ class ClinicResponse(BaseModel):
     slug: str
     whatsapp_number: str
     wa_phone_number_id: Optional[str]
+    staff_phones: Optional[str] = None
     opening_time: str
     closing_time: str
     plan: str

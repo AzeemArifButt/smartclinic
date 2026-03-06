@@ -15,6 +15,8 @@ class Clinic(Base):
     whatsapp_number = Column(String, nullable=False)
     # Meta Phone Number ID used for sending messages via API
     wa_phone_number_id = Column(String, nullable=True)
+    # Comma-separated staff WhatsApp numbers (e.g. 923001234567,923009876543)
+    staff_phones = Column(String, nullable=True)
 
     owner_email = Column(String, nullable=False)
     plan = Column(String, default="free")  # free, pro

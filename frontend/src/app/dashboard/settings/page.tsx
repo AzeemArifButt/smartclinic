@@ -21,6 +21,8 @@ export default function SettingsPage() {
   const [editSpecialty, setEditSpecialty] = useState("");
   const [waPhoneId, setWaPhoneId] = useState("");
   const [savingWa, setSavingWa] = useState(false);
+  const [staffPhones, setStaffPhones] = useState("");
+  const [savingStaff, setSavingStaff] = useState(false);
 
   useEffect(() => {
     if (!auth || auth.role !== "owner") {
@@ -32,6 +34,7 @@ export default function SettingsPage() {
       const clinic = c as Clinic;
       setClinic(clinic);
       setWaPhoneId(clinic.wa_phone_number_id || "");
+      setStaffPhones(clinic.staff_phones || "");
     });
   }, []);
 
@@ -75,6 +78,19 @@ export default function SettingsPage() {
     await api.deleteDoctor(id);
     toast.success("Doctor removed");
     loadDoctors();
+  }
+
+  async function saveStaffPhones(e: React.FormEvent) {
+    e.preventDefault();
+    setSavingStaff(true);
+    try {
+      await api.updateClinic({ staff_phones: staffPhones.trim() });
+      toast.success("Staff numbers saved");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed");
+    } finally {
+      setSavingStaff(false);
+    }
   }
 
   async function saveWhatsApp(e: React.FormEvent) {
@@ -147,6 +163,30 @@ export default function SettingsPage() {
             </button>
           </form>
           <p className="text-xs text-gray-400 mt-2">Found in Meta dashboard → WhatsApp → API Setup</p>
+        </section>
+
+        {/* Staff WhatsApp Numbers */}
+        <section className="bg-white rounded-xl border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-1">Staff WhatsApp Numbers</h2>
+          <p className="text-sm text-gray-500 mb-4">
+            Staff can send walk-in tokens and check queue status via WhatsApp bot.
+          </p>
+          <form onSubmit={saveStaffPhones} className="flex flex-col sm:flex-row gap-3">
+            <input
+              value={staffPhones}
+              onChange={(e) => setStaffPhones(e.target.value)}
+              placeholder="+923001234567, +923009876543"
+              className="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500 font-mono text-sm"
+            />
+            <button
+              type="submit"
+              disabled={savingStaff}
+              className="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-5 py-2.5 rounded-lg transition disabled:opacity-50"
+            >
+              {savingStaff ? "Saving…" : "Save"}
+            </button>
+          </form>
+          <p className="text-xs text-gray-400 mt-2">Comma-separated international format numbers (e.g. +923001234567)</p>
         </section>
 
         {/* Add Doctor */}

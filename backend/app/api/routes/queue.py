@@ -53,6 +53,25 @@ def advance_queue(
         raise HTTPException(status_code=404, detail="Doctor not found")
 
     state = qs.advance_queue(db, current_user.clinic_id, doctor_id)
+
+    # Send near-turn WhatsApp notifications (free within 24h window)
+    from app.models.clinic import Clinic
+    from app.services import whatsapp_service as wa
+    clinic = db.query(Clinic).filter(Clinic.id == current_user.clinic_id).first()
+    if clinic and clinic.wa_phone_number_id:
+        upcoming = qs.find_tokens_near_serving(
+            db, current_user.clinic_id, doctor_id, state.current_serving
+        )
+        for t in upcoming:
+            ahead = t.token_number - state.current_serving - 1
+            msg = (
+                f"🔔 *Your turn is coming soon!*\n"
+                f"Token: *#{t.token_number}*\n"
+                f"Now serving: #{state.current_serving}\n"
+                f"{'You are next! Please come now.' if ahead == 0 else f'Only {ahead} patient(s) ahead of you.'}"
+            )
+            wa.send_text(clinic.wa_phone_number_id, t.patient_phone, msg)
+
     return {"current_serving": state.current_serving}
 
 

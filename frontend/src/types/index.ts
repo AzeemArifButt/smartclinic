@@ -5,6 +5,7 @@ export interface Clinic {
   slug: string;
   whatsapp_number: string;
   wa_phone_number_id: string | null;
+  staff_phones: string | null;
   opening_time: string;
   closing_time: string;
   plan: string;

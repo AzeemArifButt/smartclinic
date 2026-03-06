@@ -113,6 +113,28 @@ def find_token_by_number_today(
     )
 
 
+def find_tokens_near_serving(
+    db: Session, clinic_id: int, doctor_id: int, current_serving: int, lookahead: int = 2
+) -> List[Token]:
+    """Returns tokens with phones within lookahead positions of current_serving."""
+    results = []
+    for pos in range(current_serving + 1, current_serving + 1 + lookahead):
+        token = (
+            db.query(Token)
+            .filter(
+                Token.clinic_id == clinic_id,
+                Token.doctor_id == doctor_id,
+                Token.token_number == pos,
+                Token.date == date.today(),
+                Token.patient_phone.isnot(None),
+            )
+            .first()
+        )
+        if token:
+            results.append(token)
+    return results
+
+
 def get_active_doctors(db: Session, clinic_id: int) -> List[Doctor]:
     return (
         db.query(Doctor)
