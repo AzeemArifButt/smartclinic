@@ -94,7 +94,7 @@ def _send_main_menu(phone_number_id: str, to: str, clinic_name: str):
             {"id": "status", "title": "Check My Status"},
             {"id": "complaint", "title": "Add Complaint"},
         ],
-        footer="Reply anytime to restart",
+        footer="Type 0 anytime to return here",
     )
 
 
@@ -426,6 +426,12 @@ def handle_message(
     # ── Text messages ──
     if message_type == "text" and text_body:
         body = text_body.strip()
+
+        # Global shortcuts — work from any state
+        if body.lower() in ("0", "menu", "main menu", "hi", "hello", "start"):
+            _reset_convo(db, convo)
+            _send_main_menu(phone_number_id, from_phone, clinic.name)
+            return
 
         if step == "awaiting_complaint":
             _save_complaint(db, clinic, from_phone, phone_number_id, body, convo)
