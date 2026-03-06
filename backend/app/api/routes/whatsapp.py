@@ -78,7 +78,10 @@ async def receive_webhook(request: Request, db: Session = Depends(get_db)):
                     .first()
                 )
             if not clinic:
-                print(f"[Webhook] No clinic found for phone_number_id={phone_number_id}")
+                all_clinics = db.query(Clinic).all()
+                for c in all_clinics:
+                    print(f"[Webhook] DB clinic: {c.name} wa_phone_number_id={repr(c.wa_phone_number_id)} whatsapp_number={repr(c.whatsapp_number)}")
+                print(f"[Webhook] No clinic found for phone_number_id={repr(phone_number_id)}")
                 continue  # Unknown number — skip
             print(f"[Webhook] Matched clinic: {clinic.name} (id={clinic.id})")
 
