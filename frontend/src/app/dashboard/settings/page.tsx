@@ -19,6 +19,8 @@ export default function SettingsPage() {
   const [editId, setEditId] = useState<number | null>(null);
   const [editName, setEditName] = useState("");
   const [editSpecialty, setEditSpecialty] = useState("");
+  const [waPhoneId, setWaPhoneId] = useState("");
+  const [savingWa, setSavingWa] = useState(false);
 
   useEffect(() => {
     if (!auth || auth.role !== "owner") {
@@ -26,7 +28,11 @@ export default function SettingsPage() {
       return;
     }
     loadDoctors();
-    api.getClinic().then((c) => setClinic(c as Clinic));
+    api.getClinic().then((c) => {
+      const clinic = c as Clinic;
+      setClinic(clinic);
+      setWaPhoneId(clinic.wa_phone_number_id || "");
+    });
   }, []);
 
   async function loadDoctors() {
@@ -71,6 +77,19 @@ export default function SettingsPage() {
     loadDoctors();
   }
 
+  async function saveWhatsApp(e: React.FormEvent) {
+    e.preventDefault();
+    setSavingWa(true);
+    try {
+      await api.updateClinic({ wa_phone_number_id: waPhoneId.trim() });
+      toast.success("WhatsApp settings saved");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed");
+    } finally {
+      setSavingWa(false);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-brand-900 text-white px-6 py-4 flex items-center gap-4">
@@ -108,6 +127,27 @@ export default function SettingsPage() {
             </p>
           </section>
         )}
+
+        {/* WhatsApp Settings */}
+        <section className="bg-white rounded-xl border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">WhatsApp Settings</h2>
+          <form onSubmit={saveWhatsApp} className="flex flex-col sm:flex-row gap-3">
+            <input
+              value={waPhoneId}
+              onChange={(e) => setWaPhoneId(e.target.value)}
+              placeholder="Phone Number ID (from Meta dashboard)"
+              className="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500 font-mono text-sm"
+            />
+            <button
+              type="submit"
+              disabled={savingWa}
+              className="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-5 py-2.5 rounded-lg transition disabled:opacity-50"
+            >
+              {savingWa ? "Saving…" : "Save"}
+            </button>
+          </form>
+          <p className="text-xs text-gray-400 mt-2">Found in Meta dashboard → WhatsApp → API Setup</p>
+        </section>
 
         {/* Add Doctor */}
         <section className="bg-white rounded-xl border border-gray-200 p-6">
