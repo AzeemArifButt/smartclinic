@@ -12,6 +12,9 @@ class Token(Base):
     token_number = Column(Integer, nullable=False)
     # null for walk-in tokens
     patient_phone = Column(String, nullable=True, index=True)
+    # Patient info collected during WhatsApp booking (for pharma analytics)
+    patient_name = Column(String, nullable=True)
+    patient_age = Column(Integer, nullable=True)
     # whatsapp | walkin
     token_type = Column(String, default="whatsapp")
     issued_at = Column(DateTime(timezone=True), server_default=func.now())

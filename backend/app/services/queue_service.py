@@ -32,6 +32,8 @@ def issue_token(
     doctor_id: int,
     patient_phone: Optional[str],
     token_type: str = "whatsapp",
+    patient_name: Optional[str] = None,
+    patient_age: Optional[int] = None,
 ) -> Token:
     today = date.today()
     qs = get_or_create_queue_state(db, clinic_id, doctor_id)
@@ -45,6 +47,8 @@ def issue_token(
         doctor_id=doctor_id,
         token_number=token_number,
         patient_phone=patient_phone,
+        patient_name=patient_name,
+        patient_age=patient_age,
         token_type=token_type,
         date=today,
     )

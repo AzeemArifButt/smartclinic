@@ -110,7 +110,7 @@ def update_clinic(
     if current_user.role != "owner":
         raise HTTPException(status_code=403, detail="Owner access required")
     clinic = db.query(Clinic).filter(Clinic.id == current_user.clinic_id).first()
-    allowed = ["opening_time", "closing_time", "wa_phone_number_id", "whatsapp_number", "staff_phones"]
+    allowed = ["opening_time", "closing_time", "wa_phone_number_id", "whatsapp_number", "staff_phones", "ad_text"]
     for key in allowed:
         if key in payload:
             setattr(clinic, key, payload[key])

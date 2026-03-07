@@ -25,4 +25,8 @@ class Clinic(Base):
     opening_time = Column(String, default="09:00")
     closing_time = Column(String, default="22:00")
 
+    # Pharma sponsor / ad text shown as footer on every WhatsApp message
+    # e.g. "Powered by GSK Pakistan"
+    ad_text = Column(String, nullable=True)
+
     created_at = Column(DateTime(timezone=True), server_default=func.now())
