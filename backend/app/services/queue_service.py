@@ -71,6 +71,12 @@ def reset_queue(db: Session, clinic_id: int, doctor_id: int) -> QueueState:
     qs.current_serving = 0
     qs.total_issued_today = 0
     qs.last_reset_date = date.today()
+    # Delete all today's tokens for this doctor
+    db.query(Token).filter(
+        Token.clinic_id == clinic_id,
+        Token.doctor_id == doctor_id,
+        Token.date == date.today(),
+    ).delete(synchronize_session=False)
     db.commit()
     db.refresh(qs)
     return qs
