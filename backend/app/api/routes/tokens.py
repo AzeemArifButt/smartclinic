@@ -46,7 +46,8 @@ def issue_walkin(
         db,
         current_user.clinic_id,
         payload.doctor_id,
-        patient_phone=None,
+        patient_phone=payload.patient_phone,
         token_type="walkin",
+        patient_name=payload.patient_name,
     )
     return token
