@@ -75,6 +75,28 @@ def advance_queue(
     return {"current_serving": state.current_serving}
 
 
+@router.post("/queue/prev")
+def prev_queue(
+    doctor_id: int,
+    current_user: ClinicUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    doctor = db.query(Doctor).filter(
+        Doctor.id == doctor_id,
+        Doctor.clinic_id == current_user.clinic_id,
+    ).first()
+    if not doctor:
+        raise HTTPException(status_code=404, detail="Doctor not found")
+
+    state = qs.get_or_create_queue_state(db, current_user.clinic_id, doctor_id)
+    if state.current_serving <= 0:
+        raise HTTPException(status_code=400, detail="Already at the beginning")
+    state.current_serving -= 1
+    db.commit()
+    db.refresh(state)
+    return {"current_serving": state.current_serving}
+
+
 @router.post("/queue/reset")
 def reset_queue(
     doctor_id: int,
